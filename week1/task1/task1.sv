@@ -1,13 +1,7 @@
-module gate_and (input logic a,b,
-              output logic y);
+module gate_and (input logic a,
+                 input logic b,
+                 output logic y);
   
   assign y = a & b;
-  
-endmodule
-
-module gate_or (input logic a,b,
-              output logic y);
-  
-  assign y = a | b;
   
 endmodule
