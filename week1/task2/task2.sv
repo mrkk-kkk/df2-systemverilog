@@ -1,6 +1,7 @@
-module task2 (input logic a,b,
-                          input logic s,
-                          output logic y);
+module task2 (input logic a,
+              input logic b,
+              input logic s,
+              output logic y);
 
 assign y = s ? b : a;
 
