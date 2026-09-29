@@ -1,1 +1,70 @@
+module detector (input  logic clk,
+                 input  logic reset,
+                 input  logic in,
+                 output logic detected);
+  
+  logic [2:0] current_state, next_state;
+  
+  parameter   Start = 3'b000,
+  			  D_0_1 = 3'b001,
+  			  D_1_1 = 3'b010,
+  			  D_2_1 = 3'b011,
+  		      D_0_0 = 3'b100,
+  		      D_1_0 = 3'b101,
+  			  D_2_0 = 3'b110;
+  
+  always_ff @(posedge clk, posedge reset)
+    begin: STATE_MEMORY
+     
+     if(reset)
+       current_state <= Start;
+     else
+       current_state <= next_state;
+    end
+      
+  always_comb
+    begin: NEXT_STATE
+     case(current_state)
+       Start: if(in == 1'b1)
+          		next_state = D_0_1;
+              else
+                next_state = D_0_0;
+       D_0_1: if(in == 1'b0)
+         		next_state = D_1_1;
+          	  else 
+                next_state = D_1_0;
+       D_1_1: if(in == 1'b1)
+                next_state = D_2_1;
+              else
+                next_state = D_2_0;
+       
+       D_2_1: next_state = Start;
+       D_0_0: next_state = D_1_0;
+       D_1_0: next_state = D_2_0;
+       D_2_0: next_state = Start;
+     
+       default: next_state = Start; 
+     endcase
+    end
+       
+  always_comb
+    begin: DETECTED_STATE
+      case(current_state)
+        D_2_1: if(in == 1'b1)
+           	     detected = 1'b1;
+               else
+      		     detected = 1'b0;
+        
+        
+        default: detected = 1'b0;
+      endcase
+    end
+endmodule
 
+  
+      
+      
+                
+       
+        
+  
