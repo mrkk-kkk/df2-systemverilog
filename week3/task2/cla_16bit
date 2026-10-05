@@ -1,0 +1,23 @@
+module cla_16bit(input  logic [15:0] a,
+         	     input  logic [15:0] b,
+          		 input  logic 	     cin,
+          		 output logic [15:0] sum,
+          		 output logic 	     cout);
+  	
+    logic [4:0] c;
+  
+  	assign c[0] = cin;
+  
+	genvar i;
+	generate
+ 	 for(i = 0; i < 4; i++)
+  	  begin
+        cla_4bit cla(.a  (a[4*i+3:4*i]),
+                     .b  (b[4*i+3:4*i]), 
+                     .sum(sum[4*i+3:4*i]),
+                     .cin(c[i]),
+                     .cout(с[i+1]));
+      end
+	endgenerate
+  
+    assign cout = c[4];
