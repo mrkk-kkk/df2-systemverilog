@@ -8,36 +8,25 @@ module spi_slave(input  logic 		clk,
                  output logic 		done);
   
   logic [2:0] bit_count;
-        
-  always_ff @(posedge sck, posedge reset)
-    begin
-      if(reset)
-        data_out <= '0;
-      else
-        data_out <= {data_out[6:0], MOSI};
-    end
-  
-always_ff@(posedge sck, posedge reset, posedge start)
-  begin
-    if (reset)
-      begin
-        bit_count <= '0;
-        done      <= 1'b0;
-      end
-    else if (start)
-      begin
-        bit_count <= '0;
-        done      <= 1'b0;
-      end
-    else
-      begin
-        bit_count <= bit_count + 3'b001;
-
-        if (bit_count == 3'b111)
-          done <= 1'b1;
-      end
-  end
-  
   assign MISO = data_out[7];
-
+        
+  always_ff @(posedge sck, posedge reset, posedge start) begin
+    if(reset) begin
+      done 	    <= 1'b0;
+      data_out  <= '0;
+      bit_count <= '0;
+    end 
+    else if(start) begin
+      done 	    <= 1'b0;
+      bit_count	<= '0;
+    end
+    else 
+      begin
+      data_out  <= {data_out[6:0], MOSI};
+      bit_count <= bit_count + 3'b001;
+      if(bit_count == 3'b111) begin
+        done <= 1'b1;
+      end
+    end
+  end
 endmodule
