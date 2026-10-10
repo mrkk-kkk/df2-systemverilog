@@ -11,33 +11,42 @@ module spi_master(input  logic       clk,
   logic [7:0] t_reg;
   logic [7:0] r_reg;
   logic [2:0] bit_count;
+  logic    busy;
+  assign MOSI = t_reg[7];
   
-  always_ff@(posedge sck, posedge reset, posedge start)
+  always_ff@(posedge clk, posedge reset)
   begin
-    if (reset)
-      begin
+    if (reset) begin
         t_reg    <= '0;
         r_reg    <= '0;
         bit_count <= '0;
+        sck    <=  0;
+        busy   <= 1'b0;
         done      <= 1'b0;
-      end
-    else if 
-      if (start)
-      begin
+    end
+
+    else if (start) begin
         t_reg    <= data_in;
         r_reg    <= '0;
         bit_count <= '0;
-        done      <= 1'b0;
-      end
-    else
-      
-      
-  always_ff @(posedge sck, posedge reset)
-    begin
-      if(reset)
-        t_reg <= '0;
-      else
-        t_reg <= {t_reg[6:0], MOSI};
+        busy   <=  1'b1;
+        done      <=  1'b0;
     end
      
- assign MOSI = t_reg[7];
+    else if(busy == 1'b1) begin
+        sck <= ~sck;
+      if(sck) begin
+         t_reg <= {t_reg[6:0], 1'b0};
+         bit_count <= bit_count + 3'b001;    
+       if (bit_count == 3'b111) begin
+          done <= 1'b1;
+          busy <= 1'b0;
+       end
+      end
+      else begin
+        r_reg <= {r_reg[6:0], MISO};
+      end
+    end
+  end
+  
+endmodule
